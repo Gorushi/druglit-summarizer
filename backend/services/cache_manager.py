@@ -1,36 +1,31 @@
 import json
-import os
-from datetime import datetime
-from typing import List, Dict, Any
+from datetime import date
 
-CACHE_FILE = "pubmed_cache.json"
+CACHE_FILE = "cache.json"
 
-def _load_cache() -> Dict[str, Any]:
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "r") as f:
-            return json.load(f)
-    return {}
+def _get_cache_file(drug: str) -> str:
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    return os.path.join(CACHE_DIR, f"{drug.lower()}.json")
 
-def _save_cache(cache: Dict[str, Any]):
-    with open(CACHE_FILE, "w") as f:
-        json.dump(cache, f, indent=2)
+def load_cache():
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            cache = json.load(f)
+            # 날짜 문자열을 다시 date 객체로 변환
+            for drug, papers in cache.items():
+                for p in papers:
+                    if "pubdate" in p:
+                        p["pubdate"] = date.fromisoformat(p["pubdate"])
+            return cache
+    except FileNotFoundError:
+        return {}
 
-def get_cached_results(drug_name: str) -> List[Dict[str, Any]]:
-    cache = _load_cache()
-    return cache.get(drug_name.lower(), [])
-
-def update_cache(drug_name: str, new_results: List[Dict[str, Any]]):
-    cache = _load_cache()
-    drug_key = drug_name.lower()
-    existing = cache.get(drug_key, [])
-
-    # 중복 제거 (pubmed_id 기준)
-    existing_ids = {item["pubmed_id"] for item in existing}
-    merged = existing + [r for r in new_results if r["pubmed_id"] not in existing_ids]
-
-    # 최신순 정렬 후 최대 15개만 유지
-    merged.sort(key=lambda x: x["pub_date"], reverse=True)
-    cache[drug_key] = merged[:15]
-
-    _save_cache(cache)
-
+def save_cache(drug: str, paper_dict: dict):
+    cache = load_cache()
+    if drug not in cache:
+        cache[drug] = []
+    # 이미 같은 title+date 조합이 있는지 확인 후 중복 방지
+    if not any(p["title"] == paper_dict["title"] and p["date"] == paper_dict["date"] for p in cache[drug]):
+        cache[drug].append(paper_dict)
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump(cache, f, indent=2, ensure_ascii=False)

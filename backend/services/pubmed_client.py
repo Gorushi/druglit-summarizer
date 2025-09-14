@@ -1,45 +1,51 @@
 import requests
-from xml.etree import ElementTree
+import xml.etree.ElementTree as ET
 
-BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 
-def fetch_pubmed_articles(drug_name: str, max_results: int = 15):
-    # Step 1: PMID 검색
-    search_url = f"{BASE_URL}esearch.fcgi"
+def search_pubmed(query: str, retmax: int = 20):
+    """
+    PubMed에서 PMID 리스트 검색
+    """
+    url = f"{BASE_URL}/esearch.fcgi"
     params = {
         "db": "pubmed",
-        "term": drug_name,
-        "retmax": max_results,
-        "retmode": "json"
+        "term": query,
+        "sort": "date",
+        "retmode": "json",
+        "retmax": retmax
     }
-    search_resp = requests.get(search_url, params=params)
-    id_list = search_resp.json().get("esearchresult", {}).get("idlist", [])
-
-    if not id_list:
+    r = requests.get(url, params=params, timeout=10)
+    if r.status_code != 200:
         return []
+    data = r.json()
+    return data.get("esearchresult", {}).get("idlist", [])
 
-    # Step 2: PMID로 상세 정보 가져오기
-    fetch_url = f"{BASE_URL}efetch.fcgi"
+
+def fetch_pubmed_abstract(pmid: str):
+    """
+    PubMed에서 논문 상세정보 가져오기 (title, abstract, pubdate)
+    """
+    url = f"{BASE_URL}/efetch.fcgi"
     params = {
         "db": "pubmed",
-        "id": ",".join(id_list),
+        "id": pmid,
         "retmode": "xml"
     }
-    fetch_resp = requests.get(fetch_url, params=params)
+    r = requests.get(url, params=params, timeout=10)
+    if r.status_code != 200:
+        return None
 
-    # XML 파싱
-    root = ElementTree.fromstring(fetch_resp.content)
-    articles = []
-    for article in root.findall(".//PubmedArticle"):
-        pmid = article.findtext(".//PMID")
-        title = article.findtext(".//ArticleTitle")
-        abstract = " ".join([abst.text for abst in article.findall(".//AbstractText") if abst.text])
+    root = ET.fromstring(r.text)
+    article = root.find(".//PubmedArticle")
+    if article is None:
+        return None
 
-        articles.append({
-            "pmid": pmid,
-            "title": title,
-            "abstract": abstract
-        })
+    title = article.findtext(".//ArticleTitle", default="")
+    abstract = " ".join(
+        [a.text for a in article.findall(".//AbstractText") if a.text]
+    )
+    pubdate = article.findtext(".//PubDate/Year", default="1900")
 
-    return articles
+    return {"title": title, "abstract": abstract, "pubdate": pubdate}
 
