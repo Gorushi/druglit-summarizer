@@ -17,13 +17,14 @@ def search(drug: str = Query(..., description="약물명 (영어로 입력)")):
         raise HTTPException(status_code=404, detail="검색 결과 없음")
 
     cache = load_cache()
-    cached_papers = cache.get(drug, [])
+    drug_cache = cache.get(drug, {})  # drug 단위 캐싱
+
     papers = []
 
     for pmid in pmid_list:
-        # 캐시 확인
-        if pmid in cache:
-            papers.append(Paper(**cache[pmid]))
+        if pmid in drug_cache:
+            # 이미 캐시되어 있으면 그대로 사용
+            papers.append(Paper(**drug_cache[pmid]))
             continue
 
         info = fetch_pubmed_abstract(pmid)
@@ -34,7 +35,14 @@ def search(drug: str = Query(..., description="약물명 (영어로 입력)")):
         pubdate_str = info.get("pubdate", "1900")
         pubdate = _parse_pubdate(pubdate_str)
 
-        summary = summarize_with_cache(drug, pmid, info.get("abstract"))
+        # 요약 + 캐싱
+        summary = summarize_with_cache(
+            drug=drug,
+            pmid=pmid,
+            title=info.get("title"),
+            text=info.get("abstract"),
+            pubdate=pubdate,
+        )
 
         paper = Paper(
             pmid=pmid,
@@ -44,9 +52,15 @@ def search(drug: str = Query(..., description="약물명 (영어로 입력)")):
             pubdate=pubdate
         )
 
-        save_cache(drug, paper.dict())
-        papers.append(paper)
+        # drug_cache 갱신
+        drug_cache[pmid] = paper.dict()
 
+    # 전체 cache에 drug_cache 반영 후 저장
+    cache[drug] = drug_cache
+    save_cache(cache)
+
+    # 최신순 정렬 & 상위 15개만 반환
+    papers = [Paper(**p) for p in drug_cache.values()]
     papers.sort(key=lambda p: p.pubdate, reverse=True)
     papers = papers[:15]
 
