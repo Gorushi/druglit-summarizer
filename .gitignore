@@ -122,4 +122,4 @@ secrets.json
 .DS_Store
 Thumbs.db
 
-/backend/cache.json
+/backend/papers.db
