@@ -123,3 +123,4 @@ secrets.json
 Thumbs.db
 
 /backend/papers.db
+/data/drug_map.json
