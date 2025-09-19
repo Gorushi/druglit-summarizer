@@ -1,29 +1,22 @@
-from fastapi import FastAPI, Query
-from pubmed_client import fetch_pubmed_articles
-from summarizer import summarize_text
+import uvicorn
+from fastapi import FastAPI
+from api.search import router as search_router
+from services.db_manager import init_db 
 
-app = FastAPI()
+app = FastAPI(
+    title="Drug Research Summarizer",
+    description="약물 이름을 입력하면 PubMed 논문 검색 → 최신순 요약 결과 제공",
+    version="1.0.0"
+)
 
-@app.get("/search")
-async def search_drug(drug: str = Query(..., description="Drug name to search for")):
-    # 1. PubMed에서 논문 가져오기
-    articles = fetch_pubmed_articles(drug, max_results=15)
+# 앱 시작 시 DB 초기화
+@app.on_event("startup")
+def on_startup():
+    init_db()
 
-    results = []
-    for article in articles:
-        title = article.get("title")
-        abstract = article.get("abstract")
-        
-        # 초록이 있을 때만 요약 수행
-        summary = summarize_text(abstract) if abstract else "No abstract available"
+# 라우터 등록
+app.include_router(search_router)
 
-        results.append({
-            "title": title,
-            "abstract": abstract,
-            "summary": summary,
-            "pmid": article.get("pmid"),
-            "link": f"https://pubmed.ncbi.nlm.nih.gov/{article.get('pmid')}/"
-        })
-
-    return {"drug": drug, "results": results}
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
 
