@@ -15,8 +15,14 @@
     "productName": "DrugLit Summarizer",
     "files": [
       "main.js",
-      "renderer/**/*",
-      "bin/backend.exe"
+      "renderer/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend/dist",
+        "to": "backend_dist",
+        "filter": ["**/*"]
+      }
     ],
     "win": {
       "target": "nsis"
@@ -27,5 +33,3 @@
     }
   }
 }
-
-

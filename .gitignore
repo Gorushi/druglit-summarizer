@@ -22,7 +22,7 @@ env/
 # 2. 빌드 및 패키징 산출물 (Build & Packaging)
 # ---------------------------------
 # Python build/packaging artifacts
-build/
+/backend/build/
 *.egg-info/
 .eggs/
 sdist/
@@ -30,13 +30,13 @@ wheels/
 *.egg
 
 # PyInstaller specific artifacts
-*.spec
+/backend/*.spec
 
 # Electron build output (installer/packaged app)
 /electron-app/dist/
 
 # Generic distribution folder (often used for backend builds)
-dist/
+/backend/dist/
 
 
 # ---------------------------------
