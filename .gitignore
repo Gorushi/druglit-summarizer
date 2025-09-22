@@ -1,125 +1,117 @@
-# ========================
-# Python
-# ========================
-__pycache__/
-*.py[cod]
-*$py.class
+# ===================================================================
+# Druglit Summarizer Project .gitignore
+# ===================================================================
+# 이 파일은 Python 백엔드와 Electron 프론트엔드 프로젝트 전체에 적용됩니다.
 
-# C extensions
-*.so
 
-# ========================
-# Packaging / Build
-# ========================
-.Python
-build/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# ---------------------------------
+# 1. 의존성 및 가상 환경 (Dependencies & Environments)
+# ---------------------------------
+# Node.js dependencies for Electron app
+/electron_app/node_modules/
 
-# ========================
-# Environments
-# ========================
-.env
-.envrc
+# Python virtual environments
 .venv/
 venv/
 ENV/
 env/
-env.bak/
-venv.bak/
-.pdm-python
-.pdm-build/
-.pixi/
+.pdm-python/
 
-# ========================
-# Logs / Outputs
-# ========================
-*.log
-logs/
-*.out
-*.err
-*.tmp
 
-# ========================
-# Unit test / Coverage
-# ========================
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
+# ---------------------------------
+# 2. 빌드 및 패키징 산출물 (Build & Packaging)
+# ---------------------------------
+# Python build/packaging artifacts
+/backend/build/
+*.egg-info/
+.eggs/
+sdist/
+wheels/
+*.egg
+
+# PyInstaller specific artifacts
+/backend/*.spec
+
+# Electron build output (installer/packaged app)
+/electron-app/dist/
+
+# Generic distribution folder (often used for backend builds)
+/backend/dist/
+
+
+# ---------------------------------
+# 3. 데이터 및 캐시 (Data & Caches)
+# ---------------------------------
+# Python cache
+__pycache__/
+*.py[cod]
 .cache/
-nosetests.xml
-coverage.xml
-*.cover
-*.py.cover
-.hypothesis/
 .pytest_cache/
-cover/
 
-# ========================
-# Databases (SQLite etc.)
-# ========================
+# Databases (local only)
 *.sqlite3
 *.db
 *.db-journal
 
-# ========================
-# Jupyter / IPython
-# ========================
-.ipynb_checkpoints
-profile_default/
-ipython_config.py
+# User-specific data files (to avoid committing samples/personal data)
+/data/drug_map.json
+/backend/papers.db
 
-# ========================
-# IDE / Editor
-# ========================
-.vscode/
-.idea/
-*.iml
-*.sublime-project
-*.sublime-workspace
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
 
-# ========================
-# HuggingFace / ML Models
-# ========================
-# HuggingFace cache
+# Machine Learning model caches and artifacts
 .huggingface/
-transformers_cache/
-datasets/
 cache/
-
-# Torch / Tensorflow
-torch_cache/
 *.bin
 *.pt
 *.ckpt
 *.h5
 
-# ========================
-# Secrets / Credentials
-# ========================
+
+# ---------------------------------
+# 4. 로그 및 임시 파일 (Logs & Temporary Files)
+# ---------------------------------
+*.log
+logs/
+*.tmp
+npm-debug.log*
+yarn-debug.log*
+
+
+# ---------------------------------
+# 5. IDE 및 에디터 설정 (IDE & Editor Configs)
+# ---------------------------------
+.vscode/
+.idea/
+*.suo
+*.sln
+*.sublime-project
+*.sublime-workspace
+
+
+# ---------------------------------
+# 6. OS 및 시스템 파일 (OS & System Files)
+# ---------------------------------
+.DS_Store
+Thumbs.db
+
+
+# ---------------------------------
+# 7. 보안 및 민감 정보 (Secrets & Credentials)
+# ---------------------------------
+.env
 secrets.json
 *.pem
 *.key
 
-# ========================
-# Misc
-# ========================
-.DS_Store
-Thumbs.db
 
-/backend/papers.db
+# ---------------------------------
+# 8. 테스트 리포트 (Test Reports)
+# ---------------------------------
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+```eof
