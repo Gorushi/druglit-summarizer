@@ -1,0 +1,159 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+.search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+#drug-input {
+    flex-grow: 1;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+#search-button {
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+#search-button:hover {
+    background-color: #2980b9;
+}
+
+#loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.1em;
+}
+
+#results-container h2 {
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.paper-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.paper-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.paper-card h3 a {
+    text-decoration: none;
+    color: #2980b9;
+}
+
+.paper-card h3 a:hover {
+    text-decoration: underline;
+}
+
+.paper-card .meta {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.paper-card p {
+    margin-bottom: 0;
+}
+
+.error {
+    color: #e74c3c;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* --- 최근 검색어 스타일 --- */
+#recent-searches-container {
+    position: fixed; /* 화면 스크롤 시에도 위치 고정 */
+    top: 40px;
+    left: calc((100% - 840px) / 2 - 240px); /* 메인 컨텐츠 왼쪽에 위치하도록 계산 */
+    width: 220px;
+    z-index: 100;
+}
+
+#recent-searches {
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#recent-searches h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1em;
+    color: #333;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+#recent-searches ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#recent-searches li a {
+    display: block;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    text-decoration: none;
+    color: #3498db;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+    word-break: break-all; /* 긴 검색어가 박스를 넘어가지 않도록 함 */
+    font-size: 0.9em;
+}
+
+#recent-searches li a:hover {
+    background-color: #3498db;
+    color: #fff;
+}
+
+#recent-searches p {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin: 0;
+}
+    
+/* 화면이 작아질 때를 위한 반응형 디자인 */
+@media (max-width: 1350px) {
+    #recent-searches-container {
+        position: static; /* 일반적인 위치로 변경 */
+        width: auto;
+        margin-bottom: 20px;
+    }
+}

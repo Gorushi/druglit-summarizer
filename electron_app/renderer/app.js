@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const recentSearchesContainer = document.getElementById('recent-searches');
 
     // FastAPI 서버 주소
-    const API_BASE_URL = 'http://127.0.0.1:8000';
+    const API_BASE_URL = 'http://127.0.0.1:8080';
 
     // 페이지가 로드되면 제일 먼저 최근 검색어 목록을 화면에 표시
     displayRecentSearches();
