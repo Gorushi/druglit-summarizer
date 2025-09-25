@@ -1,4 +1,3 @@
-// 페이지의 모든 HTML 요소가 로드된 후에 스크립트를 실행
 document.addEventListener('DOMContentLoaded', () => {
 
     // HTML에서 필요한 요소들을 가져옴
@@ -7,9 +6,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingIndicator = document.getElementById('loading');
     const resultsContainer = document.getElementById('results-container');
     const recentSearchesContainer = document.getElementById('recent-searches');
+    const themeToggle = document.getElementById('checkbox'); // 다크 모드 토글 스위치
 
     // FastAPI 서버 주소
     const API_BASE_URL = 'http://127.0.0.1:8080';
+
+    // --- 다크 모드 기능 구현 ---
+
+    // 1. 페이지 로드 시, localStorage에 저장된 테마 설정을 확인하고 적용
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeToggle.checked = true; // 토글 스위치 상태를 동기화
+    }
+
+    // 2. 토글 스위치를 클릭할 때마다 테마를 변경하고 선택을 저장
+    themeToggle.addEventListener('change', () => {
+        if (themeToggle.checked) {
+            // 다크 모드로 변경
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            // 라이트 모드로 변경
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+        }
+    });
+    
+    // --- 기존 검색 기능 ---
 
     // 페이지가 로드되면 제일 먼저 최근 검색어 목록을 화면에 표시
     displayRecentSearches();
@@ -31,7 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const drugName = drugInput.value.trim(); // 입력값의 양쪽 공백 제거
 
         if (!drugName) {
-            alert('약물 이름을 입력해주세요.');
+            // alert 대신 결과 컨테이너에 에러 메시지 표시
+            resultsContainer.innerHTML = `<p class="error">약물 이름을 입력해주세요.</p>`;
             return; // 함수 종료
         }
 
@@ -166,3 +191,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+

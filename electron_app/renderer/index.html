@@ -8,11 +8,23 @@
 </head>
 <body>
 
+    <!-- 최근 검색어 UI -->
     <div id="recent-searches-container">
         <div id="recent-searches">
-            </div>
+            <!-- JavaScript가 이 영역을 채웁니다. -->
+        </div>
     </div>
+
     <h1>DrugLit Summarizer 💊</h1>
+
+    <!-- 다크 모드 토글 스위치 -->
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider round"></div>
+        </label>
+        <em>Dark Mode</em>
+    </div>
 
     <div class="search-container">
         <input type="text" id="drug-input" placeholder="약물 이름을 영어로 입력하세요 (예: Aspirin)">
@@ -24,8 +36,10 @@
     </div>
 
     <div id="results-container">
-        </div>
+        <!-- 검색 결과가 여기에 표시됩니다. -->
+    </div>
 
     <script src="app.js"></script>
 </body>
 </html>
+
