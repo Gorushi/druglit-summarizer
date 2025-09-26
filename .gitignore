@@ -54,7 +54,7 @@ __pycache__/
 *.db-journal
 
 # User-specific data files (to avoid committing samples/personal data)
-/data/drug_map.json
+/data/drug_map_sample.json
 /backend/papers.db
 
 # Jupyter notebook checkpoints
