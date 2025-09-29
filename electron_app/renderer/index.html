@@ -8,20 +8,24 @@
 </head>
 <body>
 
-    <button id="menu-toggle" aria-label="Toggle menu">☰</button>
+    <button id="menu-toggle" aria-label="Toggle menu">
+        <div class="hamburger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
 
     <nav id="sidebar">
         <h2>Menu</h2>
         <div id="recent-searches-container">
-            <div id="recent-searches">
-                </div>
+            <div id="recent-searches"></div>
         </div>
         <div class="theme-switch-wrapper">
-            <label class="theme-switch" for="checkbox">
-                <input type="checkbox" id="checkbox" />
-                <div class="slider round"></div>
-            </label>
-            <em>Dark Mode</em>
+            <button id="theme-toggle-button" aria-label="Toggle theme">
+                <span id="theme-icon"></span>
+            </button>
+            <em><span id="theme-mode-text"></span></em>
         </div>
     </nav>
 
@@ -29,18 +33,14 @@
 
     <main id="main-content">
         <h1>DrugLit Summarizer 💊</h1>
-
         <div class="search-container">
             <input type="text" id="drug-input" placeholder="약물 이름을 영어로 입력하세요 (예: Aspirin)">
             <button id="search-button">논문 요약 검색</button>
         </div>
-
         <div id="loading">
             <p>PubMed에서 논문을 검색하고 요약하는 중입니다... 잠시만 기다려주세요.</p>
         </div>
-
-        <div id="results-container">
-            </div>
+        <div id="results-container"></div>
     </main>
 
     <script src="app.js"></script>
