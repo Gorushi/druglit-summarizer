@@ -6,10 +6,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingIndicator = document.getElementById('loading');
     const resultsContainer = document.getElementById('results-container');
     const recentSearchesContainer = document.getElementById('recent-searches');
-    const themeToggle = document.getElementById('checkbox'); // 다크 모드 토글 스위치
+    const themeToggle = document.getElementById('checkbox');
+
+    // --- 신규: 사이드바 관련 요소 ---
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
 
     // FastAPI 서버 주소
     const API_BASE_URL = 'http://127.0.0.1:8080';
+
+    // --- 신규: 사이드바 토글 기능 ---
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+    }
+
+    menuToggle.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
 
     // --- 다크 모드 기능 구현 ---
 
@@ -52,18 +66,19 @@ document.addEventListener('DOMContentLoaded', () => {
      * 검색 버튼을 누르거나 Enter 키를 입력했을 때 실행되는 메인 함수
      */
     async function handleSearch() {
-        const drugName = drugInput.value.trim(); // 입력값의 양쪽 공백 제거
-
-        if (!drugName) {
-            // alert 대신 결과 컨테이너에 에러 메시지 표시
-            resultsContainer.innerHTML = `<p class="error">약물 이름을 입력해주세요.</p>`;
-            return; // 함수 종료
+        // 검색 실행 시 사이드바가 열려있으면 닫기
+        if (sidebar.classList.contains('open')) {
+            toggleSidebar();
         }
 
-        // 1. 사용자가 입력한 검색어를 저장
+        const drugName = drugInput.value.trim();
+
+        if (!drugName) {
+            resultsContainer.innerHTML = `<p class="error">약물 이름을 입력해주세요.</p>`;
+            return;
+        }
+
         saveSearchTerm(drugName);
-        
-        // 2. 실제 검색 및 요약 로직을 실행
         performSearch(drugName);
     }
 
@@ -72,12 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {string} drugName - 검색할 약물 이름
      */
     async function performSearch(drugName) {
-        // 검색 시작 전, 이전 결과 초기화 및 로딩 표시
         resultsContainer.innerHTML = '';
         loadingIndicator.style.display = 'block';
 
         try {
-            // FastAPI 서버에 검색 요청
             const response = await fetch(`${API_BASE_URL}/search?drug=${encodeURIComponent(drugName)}`);
 
             if (!response.ok) {
@@ -92,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching search results:', error);
             resultsContainer.innerHTML = `<p class="error">오류가 발생했습니다: ${error.message}</p>`;
         } finally {
-            // 성공/실패 여부와 관계없이 로딩 숨기기
             loadingIndicator.style.display = 'none';
         }
     }
@@ -102,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {object} data - 서버로부터 받은 JSON 데이터
      */
     function displayResults(data) {
-        resultsContainer.innerHTML = ''; // 컨테이너 초기화
+        resultsContainer.innerHTML = '';
 
         const resultHeader = document.createElement('h2');
         resultHeader.textContent = `'${data.drug}' 검색 결과`;
@@ -113,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 각 논문 정보를 카드로 만들어 추가
         data.papers.forEach(paper => {
             const card = document.createElement('div');
             card.className = 'paper-card';
@@ -140,22 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {string} term - 저장할 검색어
      */
     function saveSearchTerm(term) {
-        // 1. 로컬 스토리지에서 기존 목록을 가져옴 (없으면 빈 배열로 시작)
         let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
         
-        // 2. 현재 검색어가 목록에 이미 있다면, 기존 항목을 제거
         recentSearches = recentSearches.filter(item => item.toLowerCase() !== term.toLowerCase());
         
-        // 3. 새로운 검색어를 목록의 맨 앞에 추가
         recentSearches.unshift(term);
         
-        // 4. 목록의 길이를 3개로 제한
         const limitedSearches = recentSearches.slice(0, 3);
         
-        // 5. 업데이트된 목록을 다시 로컬 스토리지에 저장
         localStorage.setItem('recentSearches', JSON.stringify(limitedSearches));
         
-        // 6. 화면의 최근 검색어 목록을 즉시 갱신
         displayRecentSearches();
     }
 
@@ -165,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayRecentSearches() {
         const recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
         
-        // 항상 제목을 먼저 표시
         recentSearchesContainer.innerHTML = '<h3>최근 검색어</h3>';
 
         if (recentSearches.length > 0) {
@@ -176,11 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 a.href = '#';
                 a.textContent = term;
                 
-                // 각 검색어를 클릭했을 때의 동작 설정
                 a.addEventListener('click', (e) => {
-                    e.preventDefault(); // 링크의 기본 동작(페이지 이동) 방지
-                    drugInput.value = term; // 검색창에 해당 단어 입력
-                    handleSearch(); // 바로 검색 실행
+                    e.preventDefault();
+                    drugInput.value = term;
+                    handleSearch(); // 검색 실행
                 });
                 li.appendChild(a);
                 ul.appendChild(li);
@@ -191,5 +194,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
-
