@@ -9,13 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
-
-    // --- 신규: 다크 모드 토글 버튼 관련 요소 ---
     const themeToggleButton = document.getElementById('theme-toggle-button');
     const themeIcon = document.getElementById('theme-icon');
     const themeModeText = document.getElementById('theme-mode-text');
-
+    const exportContainer = document.getElementById('export-container'); 
+    const exportPdfBtn = document.getElementById('export-pdf-btn');
     const API_BASE_URL = 'http://127.0.0.1:8080';
+
+    // 화면 갱신을 기다리는 Promise 기반 헬퍼 함수
+    function waitForRepaint() {
+        // requestAnimationFrame을 두 번 호출하여 스타일 변경이 확실히 적용되도록 보장
+        return new Promise(resolve => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(resolve);
+            });
+        });
+    }
 
     // --- 사이드바 토글 기능 ---
     function toggleSidebar() {
@@ -25,18 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.addEventListener('click', toggleSidebar);
     overlay.addEventListener('click', toggleSidebar);
 
-    // --- 다크 모드 기능 (버튼 방식으로 변경) ---
-
-    /**
-     * 현재 테마 상태에 따라 아이콘과 텍스트를 업데이트하는 함수
-     */
+    // --- 다크 모드 기능 ---
     function updateThemeUI() {
         const isDarkMode = document.body.classList.contains('dark-mode');
-        
-        // localStorage 상태 업데이트
         localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-
-        // 아이콘과 텍스트 변경
         if (isDarkMode) {
             themeIcon.textContent = '🌙';
             themeModeText.textContent = 'Dark Mode';
@@ -46,25 +47,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 1. 페이지 로드 시, 저장된 테마를 확인하고 body에 class 적용
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
-    updateThemeUI(); // 페이지 로드 시 UI(아이콘, 텍스트) 상태 초기화
+    updateThemeUI();
 
-    // 2. 토글 버튼 클릭 시 body의 class를 토글하고 UI 업데이트
     themeToggleButton.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         updateThemeUI();
     });
-    
-    // --- 검색 기능 (이하 동일) ---
+
+    // --- 이벤트 리스너 설정 ---
     displayRecentSearches();
     searchButton.addEventListener('click', handleSearch);
     drugInput.addEventListener('keyup', (event) => {
         if (event.key === 'Enter') handleSearch();
     });
 
+    // PDF 저장 버튼 로직 (화면 갱신 대기 기능 포함)
+    exportPdfBtn.addEventListener('click', async () => {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+
+        try {
+            if (isDarkMode) {
+                document.body.classList.remove('dark-mode');
+                // 스타일 변경이 화면에 완전히 반영될 때까지 대기
+                await waitForRepaint(); 
+            }
+            
+            // preload를 통해 노출된 API 호출
+            await window.electronAPI.printToPDF();
+
+        } catch (error) {
+            console.error("PDF 생성 중 오류가 발생했습니다:", error);
+        } finally {
+            // PDF 저장 후에는 대기 없이 즉시 원래 테마로 복구
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+    });
+
+    // --- 검색 처리 함수 ---
     async function handleSearch() {
         if (sidebar.classList.contains('open')) toggleSidebar();
         const drugName = drugInput.value.trim();
@@ -79,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function performSearch(drugName) {
         resultsContainer.innerHTML = '';
         loadingIndicator.style.display = 'block';
+        exportContainer.style.display = 'none';
+
         try {
             const response = await fetch(`${API_BASE_URL}/search?drug=${encodeURIComponent(drugName)}`);
             if (!response.ok) {
@@ -90,20 +116,27 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching search results:', error);
             resultsContainer.innerHTML = `<p class="error">오류가 발생했습니다: ${error.message}</p>`;
+            exportContainer.style.display = 'none';
         } finally {
             loadingIndicator.style.display = 'none';
         }
     }
 
+    // --- 결과 표시 함수 ---
     function displayResults(data) {
         resultsContainer.innerHTML = '';
         const resultHeader = document.createElement('h2');
         resultHeader.textContent = `'${data.drug}' 검색 결과`;
         resultsContainer.appendChild(resultHeader);
+
         if (!data.papers || data.papers.length === 0) {
             resultsContainer.innerHTML += '<p>해당 약물에 대한 논문 요약 정보를 찾을 수 없습니다.</p>';
+            exportContainer.style.display = 'none';
             return;
         }
+        
+        exportContainer.style.display = 'block';
+
         data.papers.forEach(paper => {
             const card = document.createElement('div');
             card.className = 'paper-card';
@@ -120,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- 최근 검색어 관련 함수 ---
     function saveSearchTerm(term) {
         let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
         recentSearches = recentSearches.filter(item => item.toLowerCase() !== term.toLowerCase());

@@ -90,7 +90,7 @@ h1 { text-align: center; color: var(--h1-color); }
 #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999; display: none; }
 #overlay.open { display: block; }
 
-/* --- 검색 및 결과 카드 스타일 (생략) --- */
+/* --- 검색 및 결과 카드 스타일 --- */
 .search-container { display: flex; gap: 10px; margin-bottom: 30px; }
 #drug-input { flex-grow: 1; padding: 12px; font-size: 16px; border: 1px solid var(--input-border-color); border-radius: 8px; background-color: var(--input-bg-color); color: var(--text-color); transition: border-color 0.3s, background-color 0.3s; }
 #search-button { padding: 12px 24px; font-size: 16px; cursor: pointer; background-color: var(--button-bg-color); color: white; border: none; border-radius: 8px; transition: background-color 0.3s; }
@@ -102,7 +102,7 @@ h1 { text-align: center; color: var(--h1-color); }
 .paper-card .meta { font-size: 0.9em; color: var(--text-color-light); margin-bottom: 15px; }
 .error { color: #e74c3c; font-weight: bold; text-align: center; }
 
-/* --- 최근 검색어 (사이드바 내부) (생략) --- */
+/* --- 최근 검색어 (사이드바 내부) --- */
 #recent-searches-container { padding: 15px; background-color: var(--card-bg-color); border-radius: 8px; border: 1px solid var(--card-border-color); }
 #recent-searches h3 { margin-top: 0; margin-bottom: 10px; font-size: 1em; color: var(--text-color); border-bottom: 1px solid var(--card-border-color); padding-bottom: 8px; }
 #recent-searches ul { list-style: none; padding: 0; margin: 0; }
@@ -111,20 +111,19 @@ h1 { text-align: center; color: var(--h1-color); }
 #recent-searches p { font-size: 0.9em; color: var(--text-color-light); margin: 0; }
 
 
-/* --- 다크 모드 토글 버튼 (새로운 스타일) --- */
+/* --- 다크 모드 토글 버튼 --- */
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
     justify-content: flex-start;
-    margin: 0;
+    margin-top: auto; /* 사이드바 하단으로 이동 */
     padding: 10px;
     color: var(--text-color-light);
     background-color: var(--card-bg-color);
     border-radius: 8px;
     border: 1px solid var(--card-border-color);
 }
-
 #theme-toggle-button {
     background: var(--bg-color);
     border: 1px solid var(--card-border-color);
@@ -138,7 +137,90 @@ h1 { text-align: center; color: var(--h1-color); }
     font-size: 20px;
     padding: 0;
 }
-
 #theme-icon {
     transition: transform 0.3s ease-in-out;
+}
+
+/* PDF 내보내기 버튼 */
+#export-container {
+    padding: 10px;
+    background-color: var(--card-bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--card-border-color);
+}
+#export-pdf-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    background-color: var(--button-bg-color);
+    color: #ffffff;
+}
+#export-pdf-btn:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
+/* PDF 및 인쇄 전용 스타일 */
+@media print {
+    /* 불필요한 UI 숨기기 */
+    #sidebar, #menu-toggle, #overlay {
+        display: none !important;
+    }
+    
+    /*  문서 제목(h1) 스타일 지정 (숨김 해제 및 스타일링) */
+    #main-content > h1 {
+        display: block !important;
+        text-align: center;
+        color: #000000 !important;
+        margin: 20px 0 40px 0; /* 위아래 여백 추가 */
+        font-size: 24pt; /* 폰트 크기 조정 */
+    }
+
+    /* 페이지 여백 제거 및 너비 100% 설정 */
+    body, #main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        float: none !important;
+    }
+    
+    /* 배경은 흰색, 글자는 검은색으로 고정 */
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    
+    /* 카드 스타일 재정의 */
+    .paper-card {
+        background-color: #ffffff !important;
+        border: 1px solid #dddddd !important;
+        box-shadow: none !important;
+        page-break-inside: avoid; /* 페이지 중간에 잘리지 않도록 함 */
+    }
+
+    /* 검색 결과 제목 스타일 조정 */
+    #results-container h2 {
+        color: #000000 !important;
+        border-bottom: 2px solid #dddddd !important;
+    }
+
+    /* 링크는 검은색과 밑줄로 명확히 표시 */
+    a {
+        color: #000000 !important;
+        text-decoration: underline !important;
+    }
+}
+
+/* PDF 내보내기를 위한 전환 효과 제거용 헬퍼 클래스 */
+.no-transitions * {
+    transition: none !important;
 }
