@@ -13,5 +13,5 @@ A FastAPI + google/pegasus-pubmed based local tool for pharmacology insights.
 DrugLit Summarizer is a tool that uses the [google/pegasus-pubmed] model to concisely summarize drug-related papers and literature. This project helps users quickly grasp large amounts of medical information and extract key insights.
 
 ## ✨ Key Features
-
+- drug name normalization (with RxNorm)
 ## 💻 Getting Started  
